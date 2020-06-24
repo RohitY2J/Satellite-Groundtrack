@@ -1,5 +1,5 @@
 ## Satellite-Groundtrack ## 
-Generation of ground track and 3D orbit of LEO satellite.
+Ground track and 3D orbit simulation of LEO satellite.
 - - - -
 
 ### Use:
@@ -15,3 +15,7 @@ Note: mainKeplerGroundTrack.m uses Kepler's and mainNewtonGroundTrack.m uses New
 ### References:
 1.  Howard D. Curtis - Orbital Mechanics For Engineering Students (4th ed.)
 2.  Hanspeter Schaub - Analytical Mechanics of Space Systems (2nd ed.)
+- - - -
+
+### Team:
+[Rishav](https://github.com/risherlock), [Rohit](https://www.github.com/RohitY2J), [Sagar](https://github.com/sagar-01000010) and [Shishir](https://github.com/Shishir441)
