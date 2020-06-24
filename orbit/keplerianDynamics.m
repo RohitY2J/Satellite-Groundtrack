@@ -1,28 +1,34 @@
-function [state_dot] = keplerianDynamics(~,~,kep_state)
-%%% Equations of W & w due to the effect of the Earth's oblatenes
+function E = keplerianDynamics(e, M)
+%%% Newton’s method to solve Kepler’s equation: E - e*sin(E) = M
 %
 % Inputs:
-%   kep_state = 
+%   e = Eccentricity of orbit
+%   M = Mean anomaly of orbit
 %
-% Inputs:
-%   kep_state = State vector of Keplerian elements: [a,e,i,w,W,f]
+% Output:
+%   E = Eccentric anomaly
 %
 % Reference:
 %   Howard D. Curtis - Orbital Mechanics For Engineering Students
 %
 % 2020/6/4
 
-% Unpack Keplerian parameters
-a =  kep_state(1);  
-e =  kep_state(2);  
-i =  kep_state(3);  
+tolerance = 1.e-8;
+ratio = 1;
 
-% Import physical parameters
-physicalParams
+% Initial guess for E:
+if M < pi   
+    E = M + e/2;
+else
+    E = M - e/2;
+end 
 
-fac     = -3/2*sqrt(u)*J2*Re^2/(1-e^2)^2/a^(7/2); % Common factor 
-W_dot   = fac*cos(i);                               
-w_dot   = fac*(5/2*sin(i)^2 - 2);
-
-state_dot = [W_dot, w_dot]';
+% Iterate till tolerance is met
+while abs(ratio) > tolerance
+    f     = E - e*sin(E) - M;
+    f_dot = 1 - e*cos(E);
+    
+    ratio = f/f_dot;
+    E     = E - ratio;
 end
+end %kepler_E
