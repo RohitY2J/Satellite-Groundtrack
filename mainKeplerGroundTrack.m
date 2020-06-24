@@ -2,8 +2,8 @@
 % Takes into account the effects of the Earth's oblatenes
 % 2020/6/4
 
-clc; 
-clear; 
+clc 
+clear 
 close all
 
 %%% Startup:
@@ -13,7 +13,7 @@ close all
 tic;
 % Import parameters
 initSimulationParams;  
-physicalParams    
+physicalParams;    
 i = init_kepler(3); % Not to confuse with complex i
 
 % E and M change with time 
@@ -27,44 +27,44 @@ stop_time   = start_time + sim_time*86400;  % (s)
 time        = start_time:dt:stop_time;  
 
 %%% States that are stored
-dynamic_state = zeros(2,length(time));  % [w, W] vector for RK4 integration
 keplerians    = init_kepler;            % Keplerian state in timestep t
 alpha = zeros(1,length(time)-1);        % Right ascension/Longitude (rad)
 delta = zeros(1,length(time)-1);        % Declination/Latitude (rad)
 height = zeros(1,length(time)-1);       % Height of satellite
 R = zeros(3,length(time)-1);            % Position vector in ECI or ECEF
 
-% Initial states
-dynamic_state(:,1)  = [w,W];
-theta = 0; % Angle between ECI and ECEI (theta is 0 at t=0)
+% Angle between ECI and ECEF (rad)
+% ECI and ECEF overlap at time = 0 
+theta = 0; 
 
 fprintf('Simulation in progress...');
 for i_iters = 1:length(time)-1
+    % Current time
     t = time(i_iters);
-    
-    % Update W and w using RK4 integration
-    fn = @(t,y)keplerianDynamics(t, y, keplerians);
-    dynamic_state(:,i_iters+1) = RK4(fn, dynamic_state(:,i_iters), dt, t);
    
-    % Update M, E and f
-    M = 2*pi*t/T;                           
-    E = getEccentricAnomaly(e, M);
-    f = 2*atan(tan(E/2)*sqrt((1+e)/(1-e)));
-    
     % Compute position vector in ECI frame 
     % theta(t) =  we*(t - start_time) 
     [R_eci,~]   = transformKeplerians2ECI(keplerians);
     theta       = we*(t - start_time);  
     R_ecef      = transformECI2ECEF(R_eci,theta);
     
-    R(:,i_iters)   = R_ecef; % Change R_ecef -> R_eci to see the magic
+    % Position vector to 3d plot orbit 
+    % Change R_ecef -> R_eci to see the magic
+    R(:,i_iters)   = R_ecef; 
     
-    % Compute  right ascension, diclination and height of satellite.
-    [alpha(i_iters), delta(i_iters)] = transformCartesian2Spherical(R_ecef);
+    % Right ascension, diclination of satellite to plot groundtrack
+    % Change R_ecef -> R_eci to see the magic
+    [alpha(i_iters), delta(i_iters),~] = transformCartesian2Spherical(R_ecef);
+    
+    % Update W and w
+    [W, w] = getWw(keplerians,dt);
+    
+    % Update M, E and f using Kepler's equation
+    M = 2*pi*t/T;                           
+    E = keplerianDynamics(e, M);
+    f = 2*atan(tan(E/2)*sqrt((1+e)/(1-e)));
     
     % Update Keplerian elements
-    w = dynamic_state(1,i_iters+1);
-    W = dynamic_state(2,i_iters+1);
     keplerians = [a;e;i;w;W;f];
 end
 
