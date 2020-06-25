@@ -9,6 +9,7 @@ close all
 %%% Startup:
 %     1) Run setup.m
 %     2) Initialize in initSimulation.m
+%     3) Run this file
 
 tic;
 % Import parameters
